@@ -1,3 +1,5 @@
+install.packages("") #інсталюємо пакет jsonlite
+
 library(jsonlite) #Запускаємо необхідні для роботи бібліотеки
 library(dplyr)
 library(stringr)
@@ -5,7 +7,7 @@ library(stringr)
 kh_div <- fromJSON(readLines('https://kharkiv.rada4you.org/api/divisions.json', warn = "F", encoding = "UTF-8"))
 
 first_el <- as.numeric (kh_div$id [2]) #зчитуємо id (ідентифікатор) першого голосування
-num_div <- as.numeric (lv_div$count[[1]]) #зчитуємо загальну кількість голосувань
+num_div <- as.numeric (kh_div$count[[1]]) #зчитуємо загальну кількість голосувань
 final_id <- first_el + num_div - 1 #визначаємо id (ідентифікатор) останнього голосування
 
 voting_names <- data.frame() # створюємо путстий датафрейм для запису в нього даних
