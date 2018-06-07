@@ -1,27 +1,27 @@
-install.packages("") #інсталюємо пакет jsonlite
+install.packages("jsonlite") #ВіГ­Г±ГІГ Г«ГѕВєГ¬Г® ГЇГ ГЄГҐГІ jsonlite
 
-library(jsonlite) #Запускаємо необхідні для роботи бібліотеки
+library(jsonlite) #Г‡Г ГЇГіГ±ГЄГ ВєГ¬Г® Г­ГҐГ®ГЎГµВіГ¤Г­Ві Г¤Г«Гї Г°Г®ГЎГ®ГІГЁ ГЎВіГЎГ«ВіГ®ГІГҐГЄГЁ
 library(dplyr)
 library(stringr)
 
 kh_div <- fromJSON(readLines('https://kharkiv.rada4you.org/api/divisions.json', warn = "F", encoding = "UTF-8"))
 
-first_el <- as.numeric (kh_div$id [2]) #зчитуємо id (ідентифікатор) першого голосування
-num_div <- as.numeric (kh_div$count[[1]]) #зчитуємо загальну кількість голосувань
-final_id <- first_el + num_div - 1 #визначаємо id (ідентифікатор) останнього голосування
+first_el <- as.numeric (kh_div$id [2]) #Г§Г·ГЁГІГіВєГ¬Г® id (ВіГ¤ГҐГ­ГІГЁГґВіГЄГ ГІГ®Г°) ГЇГҐГ°ГёГ®ГЈГ® ГЈГ®Г«Г®Г±ГіГўГ Г­Г­Гї
+num_div <- as.numeric (kh_div$count[[1]]) #Г§Г·ГЁГІГіВєГ¬Г® Г§Г ГЈГ Г«ГјГ­Гі ГЄВіГ«ГјГЄВіГ±ГІГј ГЈГ®Г«Г®Г±ГіГўГ Г­Гј
+final_id <- first_el + num_div - 1 #ГўГЁГ§Г­Г Г·Г ВєГ¬Г® id (ВіГ¤ГҐГ­ГІГЁГґВіГЄГ ГІГ®Г°) Г®Г±ГІГ Г­Г­ГјГ®ГЈГ® ГЈГ®Г«Г®Г±ГіГўГ Г­Г­Гї
 
-voting_names <- data.frame() # створюємо путстий датафрейм для запису в нього даних
+voting_names <- data.frame() # Г±ГІГўГ®Г°ГѕВєГ¬Г® ГЇГіГІГ±ГІГЁГ© Г¤Г ГІГ ГґГ°ГҐГ©Г¬ Г¤Г«Гї Г§Г ГЇГЁГ±Гі Гў Г­ГјГ®ГЈГ® Г¤Г Г­ГЁГµ
 
-for (i in first_el:final_id){ # Прописуєм цикл, який перебиратиме ID від першого до останнього голосування 
-  url <- sprintf("https://kharkiv.rada4you.org/api/division.json?division=%s", i) # формуємо посилання на адресу з інформацією про голосування, яка змінюватиметься в циклі
-    res_names <- fromJSON(readLines(url, warn = "F", encoding = "UTF-8")) #зчитуємо поточне голосування
-    b = data.frame(id = res_names$id, #формуємо рядок з інформацією про потрібне голосування для запису у наш датафрейм
+for (i in first_el:final_id){ # ГЏГ°Г®ГЇГЁГ±ГіВєГ¬ Г¶ГЁГЄГ«, ГїГЄГЁГ© ГЇГҐГ°ГҐГЎГЁГ°Г ГІГЁГ¬ГҐ ID ГўВіГ¤ ГЇГҐГ°ГёГ®ГЈГ® Г¤Г® Г®Г±ГІГ Г­Г­ГјГ®ГЈГ® ГЈГ®Г«Г®Г±ГіГўГ Г­Г­Гї 
+  url <- sprintf("https://kharkiv.rada4you.org/api/division.json?division=%s", i) # ГґГ®Г°Г¬ГіВєГ¬Г® ГЇГ®Г±ГЁГ«Г Г­Г­Гї Г­Г  Г Г¤Г°ГҐГ±Гі Г§ ВіГ­ГґГ®Г°Г¬Г Г¶ВіВєГѕ ГЇГ°Г® ГЈГ®Г«Г®Г±ГіГўГ Г­Г­Гї, ГїГЄГ  Г§Г¬ВіГ­ГѕГўГ ГІГЁГ¬ГҐГІГјГ±Гї Гў Г¶ГЁГЄГ«Ві
+    res_names <- fromJSON(readLines(url, warn = "F", encoding = "UTF-8")) #Г§Г·ГЁГІГіВєГ¬Г® ГЇГ®ГІГ®Г·Г­ГҐ ГЈГ®Г«Г®Г±ГіГўГ Г­Г­Гї
+    b = data.frame(id = res_names$id, #ГґГ®Г°Г¬ГіВєГ¬Г® Г°ГїГ¤Г®ГЄ Г§ ВіГ­ГґГ®Г°Г¬Г Г¶ВіВєГѕ ГЇГ°Г® ГЇГ®ГІГ°ВіГЎГ­ГҐ ГЈГ®Г«Г®Г±ГіГўГ Г­Г­Гї Г¤Г«Гї Г§Г ГЇГЁГ±Гі Гі Г­Г Гё Г¤Г ГІГ ГґГ°ГҐГ©Г¬
                    date = res_names$date,
                    number = res_names$number,
                    name = res_names$name,
                    clock_time = res_names$clock_time)
-  voting_names <- rbind (voting_names, b) #приєднуємо наш рядок до загалльного датафрейму
+  voting_names <- rbind (voting_names, b) #ГЇГ°ГЁВєГ¤Г­ГіВєГ¬Г® Г­Г Гё Г°ГїГ¤Г®ГЄ Г¤Г® Г§Г ГЈГ Г«Г«ГјГ­Г®ГЈГ® Г¤Г ГІГ ГґГ°ГҐГ©Г¬Гі
   print(i)
 }
   
-write.csv (voting_names, file = "kharkiv_names.csv", row.names = F) #формуємо з отриманого датафрейму csv-файл
+write.csv (voting_names, file = "kharkiv_names.csv", row.names = F) #ГґГ®Г°Г¬ГіВєГ¬Г® Г§ Г®ГІГ°ГЁГ¬Г Г­Г®ГЈГ® Г¤Г ГІГ ГґГ°ГҐГ©Г¬Гі csv-ГґГ Г©Г«
